@@ -1,0 +1,31 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001-create-client
+      author: trainee
+      changes:
+        - createTable:
+            tableName: client
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: full_name
+                  type: varchar(200)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: inn
+                  type: varchar(12)
+                  constraints:
+                    nullable: false
+                    unique: true
+                    uniqueConstraintName: uq_client_inn
+              - column:
+                  name: created_at
+                  type: timestamp
+                  defaultValueComputed: now()

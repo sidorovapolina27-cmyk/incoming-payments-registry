@@ -1,0 +1,63 @@
+databaseChangeLog:
+  - changeSet:
+      id: 003-create-payment
+      author: trainee
+      changes:
+        - createTable:
+            tableName: payment
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: external_id
+                  type: varchar(100)
+                  constraints:
+                    nullable: false
+                    unique: true
+                    uniqueConstraintName: uq_payment_external_id
+              - column:
+                  name: payer_name
+                  type: varchar(200)
+              - column:
+                  name: payer_account
+                  type: varchar(20)
+              - column:
+                  name: payee_account
+                  type: varchar(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: amount
+                  type: numeric(19, 2)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: currency
+                  type: varchar(3)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: purpose
+                  type: varchar(500)
+              - column:
+                  name: value_date
+                  type: date
+              - column:
+                  name: status
+                  type: varchar(16)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: reject_reason
+                  type: varchar(500)
+              - column:
+                  name: payee_account_id
+                  type: bigint
+                  constraints:
+                    foreignKeyName: fk_payment_payee_account
+                    references: account(id)
