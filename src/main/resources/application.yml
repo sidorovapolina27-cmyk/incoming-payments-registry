@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: incoming-payments-registry   # имя сервиса: под ним он виден в Consul
+  config:
+    # подключение к Consul для чтения настроек. optional: = если Consul недоступен,
+    # приложение всё равно стартует (без консульских настроек)
+    import: optional:consul://localhost:8500
+  cloud:
+    consul:
+      host: localhost
+      port: 8500
+      config:
+        enabled: true
+        format: YAML                  # содержимое ключа — YAML
+        prefixes: config
+        default-context: incoming-payments-registry
+        data-key: data                # итоговый путь ключа: config/incoming-payment-registry/data
+        fail-fast: false              # недоступный Consul — не повод падать
