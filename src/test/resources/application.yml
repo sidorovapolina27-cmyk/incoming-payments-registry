@@ -1,6 +1,20 @@
 spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/payments   # те же логин/пароль, что создали в шаге 2
+    username: payments
+    password: payments
+  jpa:
+    hibernate:
+      ddl-auto: validate   # ВАЖНО: Hibernate только проверяет схему, но не создаёт и не меняет
+    show-sql: true         # печатать SQL в консоль — для учёбы очень полезно
+    open-in-view: false    # хорошая практика: не держать сессию базы открытой до отдачи ответа
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yaml
   cloud:
     consul:
       enabled: false
       config:
         enabled: false
+
+server:
+  port: 8082

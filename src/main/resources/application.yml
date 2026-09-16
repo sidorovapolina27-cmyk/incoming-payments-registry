@@ -1,18 +1,20 @@
 spring:
-  application:
-    name: incoming-payments-registry   # имя сервиса: под ним он виден в Consul
-  config:
-    # подключение к Consul для чтения настроек. optional: = если Consul недоступен,
-    # приложение всё равно стартует (без консульских настроек)
-    import: optional:consul://localhost:8500
+  datasource:
+    url: jdbc:postgresql://localhost:5432/payments   # те же логин/пароль, что создали в шаге 2
+    username: payments
+    password: payments
+  jpa:
+    hibernate:
+      ddl-auto: validate   # ВАЖНО: Hibernate только проверяет схему, но не создаёт и не меняет
+    show-sql: true         # печатать SQL в консоль — для учёбы очень полезно
+    open-in-view: false    # хорошая практика: не держать сессию базы открытой до отдачи ответа
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yaml
   cloud:
     consul:
-      host: localhost
-      port: 8500
+      enabled: false
       config:
-        enabled: true
-        format: YAML                  # содержимое ключа — YAML
-        prefixes: config
-        default-context: incoming-payments-registry
-        data-key: data                # итоговый путь ключа: config/incoming-payment-registry/data
-        fail-fast: false              # недоступный Consul — не повод падать
+        enabled: false
+
+server:
+  port: 8082
