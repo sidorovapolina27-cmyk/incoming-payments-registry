@@ -3,12 +3,14 @@ package com.example.payments.payment.repository;
 import com.example.payments.payment.entity.Payment;
 import com.example.payments.payment.entity.PaymentStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface PaymentRepository extends JpaRepository<Payment, Long> {
+public interface PaymentRepository extends JpaRepository<Payment, Long>,
+        JpaSpecificationExecutor<Payment> {
 
     boolean existsByExternalId(String externalId);
 

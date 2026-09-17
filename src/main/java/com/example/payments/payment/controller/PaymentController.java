@@ -6,6 +6,7 @@ import com.example.payments.payment.entity.PaymentStatus;
 import com.example.payments.payment.service.PaymentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -40,5 +43,18 @@ public class PaymentController {
     public List<PaymentDto> byAccount(@RequestParam String accountNumber,
                                       @RequestParam PaymentStatus status) {
         return paymentService.findByAccountAndStatus(accountNumber, status);
+    }
+    @GetMapping("/api/payments")
+    public List<PaymentDto> search(
+            @RequestParam(required = false) PaymentStatus status,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateFrom,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateTo,
+            @RequestParam(required = false) BigDecimal minAmount,
+            @RequestParam(required = false) BigDecimal maxAmount,
+            @RequestParam(required = false) String clientName,
+            @RequestParam(required = false) String purpose,
+            @RequestParam(required = false) String accountNumber) {
+        return paymentService.search(status, dateFrom, dateTo, minAmount, maxAmount,
+                clientName, purpose, accountNumber);
     }
 }

@@ -10,10 +10,14 @@ import com.example.payments.payment.dto.PaymentDto;
 import com.example.payments.payment.entity.Payment;
 import com.example.payments.payment.entity.PaymentStatus;
 import com.example.payments.payment.repository.PaymentRepository;
+import com.example.payments.payment.repository.PaymentSpecifications;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -80,9 +84,29 @@ public class PaymentService {
     }
 
     @Transactional(readOnly = true)
-    public List<PaymentDto> findByAccountAndStatus(String accountNumber, PaymentStatus status) {
-        return paymentRepository.findByPayeeAccountAndStatus(accountNumber, status).stream()
+    public List<PaymentDto> search(PaymentStatus status,
+                                   LocalDate dateFrom,
+                                   LocalDate dateTo,
+                                   BigDecimal minAmount,
+                                   BigDecimal maxAmount,
+                                   String clientName,
+                                   String purpose,
+                                   String accountNumber) {
+        Specification<Payment> spec = Specification.allOf(
+                PaymentSpecifications.hasStatus(status),
+                PaymentSpecifications.valueDateFrom(dateFrom),
+                PaymentSpecifications.valueDateTo(dateTo),
+                PaymentSpecifications.amountFrom(minAmount),
+                PaymentSpecifications.amountTo(maxAmount),
+                PaymentSpecifications.clientNameContains(clientName),
+                PaymentSpecifications.purposeContains(purpose),
+                PaymentSpecifications.accountNumberEquals(accountNumber)
+        );
+        return paymentRepository.findAll(spec).stream()
                 .map(PaymentDto::new)
                 .toList();
     }
-}
+
+    public List<PaymentDto> findByAccountAndStatus(String accountNumber, PaymentStatus status) {
+        return List.of();
+    }}
