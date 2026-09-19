@@ -3,11 +3,14 @@ package com.example.payments.payment.controller;
 import com.example.payments.payment.dto.CreatePaymentDto;
 import com.example.payments.payment.dto.PaymentDto;
 import com.example.payments.payment.entity.PaymentStatus;
+import com.example.payments.payment.service.PaymentImportService;
 import com.example.payments.payment.service.PaymentService;
+import com.example.payments.payment.xml.IncomingPaymentsXml;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,11 +28,11 @@ import java.util.List;
 public class PaymentController {
 
     private final PaymentService paymentService;
+    private final PaymentImportService paymentImportService;   // ← добавлено final-поле
 
     @PostMapping("/api/payments")
     public ResponseEntity<PaymentDto> create(@Valid @RequestBody CreatePaymentDto dto) {
         PaymentDto payment = paymentService.processPayment(dto);
-        // ВАЖНО: и POSTED, и REJECTED — это 201 Created (платёж принят и зафиксирован)
         return ResponseEntity.status(HttpStatus.CREATED).body(payment);
     }
 
@@ -38,12 +41,12 @@ public class PaymentController {
         return paymentService.getById(id);
     }
 
-    /** Статический запрос: счёт + статус. */
     @GetMapping("/api/payments/by-account")
     public List<PaymentDto> byAccount(@RequestParam String accountNumber,
                                       @RequestParam PaymentStatus status) {
         return paymentService.findByAccountAndStatus(accountNumber, status);
     }
+
     @GetMapping("/api/payments")
     public List<PaymentDto> search(
             @RequestParam(required = false) PaymentStatus status,
@@ -56,5 +59,12 @@ public class PaymentController {
             @RequestParam(required = false) String accountNumber) {
         return paymentService.search(status, dateFrom, dateTo, minAmount, maxAmount,
                 clientName, purpose, accountNumber);
+    }
+
+    /** Импорт реестра платежей из XML. */
+    @PostMapping(value = "/api/payments/import", consumes = MediaType.APPLICATION_XML_VALUE)
+    public ResponseEntity<List<PaymentDto>> importXml(@RequestBody IncomingPaymentsXml incoming) {
+        List<PaymentDto> imported = paymentImportService.importPayments(incoming);
+        return ResponseEntity.status(HttpStatus.CREATED).body(imported);
     }
 }
